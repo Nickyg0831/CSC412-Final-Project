@@ -13,7 +13,7 @@ Project:
     will be able to survive or not
     
 Github repo:
-    
+    https://github.com/Nickyg0831/CSC412-Final-Project
 
 """
 
