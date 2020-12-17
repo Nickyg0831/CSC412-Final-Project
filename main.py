@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-
 Created on Thurs Dec 10 2020
-
 @authors:
     Ahmed, Yoseph
     Giasi, Nicholas
     Fernando, Nattandige
-
 Project:
     Using a dataset, we will predict whether a passenger of the Titanic 
     will be able to survive or not
     
 Github repo:
     https://github.com/Nickyg0831/CSC412-Final-Project
-
 """
 
 import pandas as pd
@@ -63,15 +59,12 @@ data['Age'] = data['Age'].fillna(100)
 Here, we accomplished three things:
 We have fixed any data fields with missing data,
 We have created a boolean for sex and for cabin.
-
 The 'Name' column currently has no function.
 We can iterate through the values and pull the title of the person.
 We can then recombine all titles into four general sub-categories.
 This will result in a new column called 'Title'.
-
 We will also create a new column called 'Family_Size' for family size.
 From it we can obtain some useful information.
-
 This will be done following a tutorial by TriangleInequality:
     https://triangleinequality.wordpress.com/2013/09/08/basic-feature-engineering-with-the-titanic-data/
 """
@@ -92,6 +85,7 @@ def substrings_in_string(String, subStrings):
 # Here we map the title found in the name to a new column called Title
 data['Title']=data['Name'].map(lambda x: substrings_in_string(x, title_list))
  
+
 # Replacing all titles with Mr, Mrs, Miss, Master
 def replace_titles(x):
     title=x['Title']
@@ -114,3 +108,11 @@ data['Title']=data.apply(replace_titles, axis=1)
 
 # Creating new Family_Size column
 data['Family_Size']=data['SibSp']+data['Parch']
+
+#Converting 'Embarked' into its boolean and deleting original 'Embarked'
+data['Embarked_C'] = X_encoded['Embarked_C']
+data['Embarked_Q'] = X_encoded['Embarked_Q']
+data['Embarked_S'] = X_encoded['Embarked_S']
+del data['Embarked']
+
+
