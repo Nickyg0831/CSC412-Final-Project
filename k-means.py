@@ -3,11 +3,17 @@
 K-Means Clustering
 Using 2 groups (survivors/non-survivors)
 k-means is not a classification tool
+
+**NOTE ON ACCURACY**
+The group that Survived can be either represented as 0 or a 1!
+This is due to the degree of randomness in the algorithm.
+Therefore, sometimes the accuracy may appear to be low.
+In the accuracy test, we assume survived corresponds to 1.
+So, if in the algorithm survived is actually represented as a 0,
+take (100%-predictedAccuracy).
+Or, you can just keep re-running the algorithm and see if the results are consistent.
 """
 from main import data
-import matplotlib.pyplot as plt
-from matplotlib import style
-style.use('ggplot')
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn import preprocessing
@@ -15,8 +21,8 @@ from sklearn import preprocessing
 # keeping an original copy of data so we can reuse it
 og_data = data.copy()
 
-#Columns with type of object need to be dropped
-#We want to convert all datatypes to a numerical value that we can run k-means on
+# Columns with type of object need to be dropped
+# We want to convert all datatypes to a numerical value that we can run k-means on
 data.drop(['Title','Name','Ticket'], 1, inplace=True)
 
 def handle_non_numerical_data(df):
@@ -40,6 +46,7 @@ def handle_non_numerical_data(df):
 
     return df
 
+# convert any non-numerical data into something we can use
 data = handle_non_numerical_data(data)
 
 # X contains the variables which we will draw our prediction from
@@ -133,10 +140,10 @@ This is interesting, because one would think that family size would be a
 significant factor in ones survivability. 
 A smaller family would mean less people to worry about.
 
-Let's continue dropping columns. Now we will drop the Embarked column.
+Let's continue dropping columns. Now we will drop the Embarked columns.
 """
 
-data.drop(['Embarked'], 1, inplace=True)
+data.drop(['Embarked_C', 'Embarked_Q', 'Embarked_S'], 1, inplace=True)
 X = np.array(data.drop(['Survived'], 1).astype(float))
 y = np.array(data['Survived'])
 X = preprocessing.scale(X)
@@ -150,11 +157,11 @@ for i in range(len(X)):
     if prediction[0] == y[i]:
         correct += 1
 
-print("K-Means Classification Accuracy After Dropping Embarked: ", correct/len(X))
+print("K-Means Classification Accuracy After Dropping Embarked Columns: ", correct/len(X))
 #0.7037037037037037
 
 """
-After dropping the Embarked column, there was a minor change in accuracy of about 1%.
+After dropping the Embarked columns, there was a minor change in accuracy of about 1%.
 I wonder if there is a correlation between Fare and Survived.
 My guess is that a higher fare meant a higher chance at survival.
 This is mainly because the wealthy were most likely prioritized.
@@ -209,11 +216,12 @@ print("K-Means Classification Accuracy for only Fare: ", correct/len(X))
 It appears that dropping PassengerId has a significant affect on the result.
 This seemed to improve the K-Means Classification Accuracy Before Pre-Processing
 by roughly 14 percent, however for the other accuracies there was a minor difference.
+This is very unusual, because it is not like order should effect the accuracy in any way.
 
 What if we were to take the original dataframe, and remove everything but age, sex, and survived
 """
 
-og_data.drop(['PassengerId', 'Pclass', 'Name', 'SibSp', 'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked', 'Title', 'Family_Size'], 1, inplace=True)
+og_data.drop(['PassengerId', 'Pclass', 'Name', 'SibSp', 'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked_C', 'Embarked_Q', 'Embarked_S', 'Title', 'Family_Size'], 1, inplace=True)
 X = np.array(og_data.drop(['Survived'], 1).astype(float))
 y = np.array(og_data['Survived'])
 X = preprocessing.scale(X)
@@ -235,4 +243,28 @@ Interesting! It appears that by considering only Age and Sex, the machine was ab
 into clusters wth approximately 78% accuracy. 
 From this (and based on factual information), we can assume that
 if an individual was a woman or a child, they were evacuated first and had higher probability of survival.
+
+Now let us only consider sex.
+"""
+
+og_data.drop(['Age'], 1, inplace=True)
+X = np.array(og_data.drop(['Survived'], 1).astype(float))
+y = np.array(og_data['Survived'])
+X = preprocessing.scale(X)
+clf.fit(X)
+
+correct = 0
+for i in range(len(X)):
+    predict_me = np.array(X[i].astype(float))
+    predict_me = predict_me.reshape(-1, len(predict_me))
+    prediction = clf.predict(predict_me)
+    if prediction[0] == y[i]:
+        correct += 1
+        
+print("K-Means Classification Accuracy for only Sex: ", correct/len(X))
+#0.7867564534231201
+
+"""
+The result after only considering sex is fairly similar to the accuracy when Age and Sex parameters were considered.
+Roughly 78% accuracy.
 """
