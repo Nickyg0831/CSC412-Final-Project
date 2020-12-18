@@ -58,11 +58,14 @@ print('The accuracy of the Logistic Regression is',round(accuracy_score(predicti
 kfold = KFold(n_splits=10, random_state=22) # k=10, split the data into 10 equal parts
 result_lr=cross_val_score(model,X,y,cv=10,scoring='accuracy')
 print('The Mean Cross Validated Score for Logistic Regression is:',round(result_lr.mean()*100,2))
+# 83.05
 
 # range of scores
 scores = pd.Series(result_lr)
 print("\nMCV min: ", round(scores.min(),2),
       "\nMCV max: ", round(scores.max(),2))
+#MCV min:  0.76 
+#MCV max:  0.87
 
 print('-------------------------------------------------------------------')
 
